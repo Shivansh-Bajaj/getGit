@@ -17,18 +17,23 @@ class mainController extends Controller
 
     public function search(Request $request) {
 
-    	error_log('Display this on the screen');
     	$base_url = "https://api.github.com/search/users?q=";
     	$client = new Client();
     	$name = $request->input('name');
     	$language = $request->input('language');
-    	if($name != "") {
-    		$base_url = $base_url.$name;
-    	}
-    	if($language != "" || $language != Null) {
-    		$base_url = $base_url."language:".$name;
-    	}
-		$res = $client->get($base_url);
+    	$base_url = $base_url.$name;
+    	$base_url = $base_url."language:".$name;
+		if ($name=="" && $language==""){
+			return response()->json(array('error'=>$error, 'message'=>'name,email or language field is required','success'=>false), 201);
+		}
+		else {
+			try {
+				$res = $client->get($base_url);	
+			} catch (Exception $e) {
+	        	return response()->json(array('error'=>$e, 'message'=>'error with api','success'=>false), 201);
+			}
+
+		}
 		$data = null;
 		$error = null;
 		Log::info("this is log");
@@ -43,8 +48,10 @@ class mainController extends Controller
 			$message = "";
 			if($data['total_count']<1) {
 				$message = 'no result found';
+				return response()->json(array('data'=>$data['items'], 'message'=>$message,'success'=>false), 201);
+			} else {
+				return response()->json(array('data'=>$data['items'], 'message'=>$message,'success'=>true), 201);
 			}
-			return response()->json(array('data'=>$data['items'], 'message'=>$message,'success'=>true), 201);
 		}
 	}
 }

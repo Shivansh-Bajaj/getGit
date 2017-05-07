@@ -16,4 +16,4 @@
 // });
 
 Route::get('/', 'mainController@index');
-Route::post('/result', 'mainController@search');
+Route::post('/api/search', 'mainController@search');

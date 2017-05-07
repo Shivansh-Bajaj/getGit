@@ -3,77 +3,47 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>	
 	<style type="text/css">
-		
+		.list-group-item img {
+ 	   		height: 40px;
+       		width: 40px;
+       		margin-right: 15px;
+			top: 0px;   
+		}
 	</style>
 	</head>
 	<body>
-		<div class="container bootcards-container" id="main" ng-controller="ProfileController as proCtrl">
-		    <div class="row" style="margin-top: 50px;">      
-		      <div class="col-sm-5 bootcards-list" id="list" data-title="Contacts">
-		       <div class="panel panel-default">
-		         <div class="panel-body">
-		           <div class="search-form">
-		             <div class="row">
-		                 <div class="col-xs-9">
-		                   <div class="form-group">
-		                     <input type="text" id="name" class="form-control" placeholder="email, name">
-		                     <i class="fa fa-search"></i>
-		                   </div>
-		                  <div class="form-group">
-		                     <input type="text" id="language" class="form-control" placeholder="tag, language">
-		                     <i class="fa fa-search"></i>
-		                   </div>
-		                 </div>
-		                 <div class="col-xs-3">
-		                   <button class="btn btn-primary pull-rights" id="search">
-		                    search</button>
-		                 </div>
-		                 {{ csrf_field() }}
-		             </div>
-		           </div>
-		         </div>
-		         <div class="list-group">
-		             <div class="list-group-item pjax" style="margin-bottom: 12px;" >
-		               <h4 class="list-group-item-heading" id="user_name"></h4>
-		               <p class="list-group-item-text" id="user_organization"></p>
-		             </div>
+		<div class="container bootcards-container">
+
+		    <div class="row" style="margin-top: 50px;">
+		    	<div class="text-center col-md-12">
+		    		<font face="Comic sans MS" size="7">
+		    			Find Github Users
+		    		</font>
+		    	</div>
+		      	<div class="col-md-12 bootcards-list">
+		       		<div class="panel panel-default">
+		         		<div class="panel-body">
+		           			<div class="search-form">
+		             			<div class="row">
+		                 			<div class="col-md-10">
+					                   <div class="form-group">
+					                    	<input type="text" id="name" class="form-control" placeholder="email, name">
+					                   </div>
+					                  	<div class="form-group">
+					                    	<input type="text" id="language" class="form-control" placeholder="language">
+					                	</div>
+					                </div>
+			                 		<div class="col-md-2">
+			                   			<button class="btn btn-primary pull-rights" id="search">
+			                    		search</button>
+			                 		</div>
+			                 		{{ csrf_field() }}
+		             			</div>
+		           			</div>
+		         		</div>
+		        		<div class="list-group" id="list"></div>
 		        	</div>
-		         </div>
-		       </div>
-		        <div class="col-sm-7 bootcards-cards hidden-xs" id="listDetails">
-			 		<div class="panel panel-default">
-						 <div class="panel-heading clearfix">
-							 <h3 class="panel-title pull-left" style="padding-top: 8px;"> Details</h3>
-							 <div class="btn-group pull-right visible-xs">
-
-							 </div>
-							
-						 </div>
-
-						 <div class="list-group">
-							 <div class="list-group-item">
-								 <label>Name</label>
-								 <h4 class="list-group-item-heading" id="user_name"></h4>
-							 </div>
-							 <div class="list-group-item">
-								 <label>Service Areas</label>
-								 <h4 class="list-group-item-heading" id="user_department"></h4>
-							 </div>
-							 <div class="list-group-item" >
-								 <label>mobile no</label>
-								 <h4 class="list-group-item-heading" id="user_phone"></h4>
-							 </div>
-							 <div class="list-group-item" >
-								 <label>Email</label>
-								 <h4 class="list-group-item-heading" id="user_mail"></h4>
-							 </div>
-			                <div class="list-group-item">
-			                	<label>About Firm</label>
-			                	<h4 class="list-group-item-heading" id="user_about"></h4>
-			              </div>
-						 </div>
-					</div>
-		        </div>
+		    	</div>
 			</div>
 		</div> 
 		<script
@@ -92,19 +62,39 @@
 	        }
 	    </script>
 		<script>
-     $(document).ready(function(){
+		    $(document).ready(function(){
+		        $("#search").click(function(){
+		        	if($('#name').val()=="" &&  $("#language").val()==""){
+		        		alert("some input is required");
+		        	} else{
+		        		console.log($('#name').val(), $("#language").val());
+			            $('#list').empty();
+			        	$.post("/api/search",
+			            {
+			            	_token: $('input[name="_token"]').val(),
+			               	name: $("#name").val(),
+			               	language: $("#language").val()
+			            }).done(function(response){
+			            	if(response['success']){
+			            		$.each(response.data,function (key, value) {
+			            		$('#list').append('<a class="list-group-item pjax" href="'+ value['html_url'] +'" id="element'+ key +'" style="height: 60px;" ><img class="img-rounded pull-left" src="'+value['avatar_url']+'"><h4 class="list-group-item-heading" id="user_name">' + value['login'] + '</h4><p class="list-group-item-text" ></p></div></a>');	
+			            		});
+			            	} else {
+			            		alert(response['message']);
+			            	}
+			            	
+			            });  
+		        	}
+		        });
 
-        $("#search").click(function(){
-        	$.post("/result",
-            {
-            	_token: $('input[name="_token"]').val(),
-               	name: $("#name").val(),
-               	language: $("#language").val()
-            });  
-           event.preventDefault() ;
-        });    
-    });
-</script>
-
+		    });
+    	</script>
+    	<script>
+	    	$(document).ready(function(){
+	        	$('a.pjax').click(function(){
+	        		console.log('this is awesome');
+	        	})
+	    	});
+		</script>
 	</body>
 </html>
