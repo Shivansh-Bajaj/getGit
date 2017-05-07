@@ -1,5 +1,6 @@
 # getGit
-application to search github users on from input email, name or skill(languages).  
+application to search github users on from input email, name or skill(languages).    
+url: https://getgituser.herokuapp.com
 ## Steps to build:  
 1.) install php7.0  
 2.) dependencies: sudo apt install php7.0-mcrypt php7.0-gd php7.0-mbstring  
